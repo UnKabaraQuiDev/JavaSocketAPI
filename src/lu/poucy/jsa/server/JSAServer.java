@@ -2,6 +2,7 @@ package lu.poucy.jsa.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -29,9 +30,9 @@ public class JSAServer implements JSA {
 	
 	private ServerSocket socket;
 	private int port = 0;
-	private char[] key;
+	private int[] key;
 	
-	public JSAServer(int port, char[] key) throws IllegalJSAServerState, IOException, KeyToShortException {
+	public JSAServer(int port, int[] key) throws IllegalJSAServerState, IOException, KeyToShortException {
 		if(key.length <= 3)
 			throw new KeyToShortException(key);
 		if(socket != null)
@@ -92,6 +93,8 @@ public class JSAServer implements JSA {
 	public void registerListener(JSAListener listener) {if(!listeners.contains(listener)) listeners.add(listener);}
 	public void unregisterListener(JSAListener listener) {if(listeners.contains(listener)) listeners.remove(listener);}
 	
+	public InetAddress getHost() {return socket.getInetAddress();}
+	public int getPort() {return port;}
 	
 	public void close() throws IOException {socket.close();}
 	

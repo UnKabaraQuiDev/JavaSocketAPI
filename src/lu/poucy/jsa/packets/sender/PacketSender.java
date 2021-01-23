@@ -20,7 +20,7 @@ public class PacketSender {
 		this.type = type;
 	}
 	
-	public boolean start(Consumer<Exception> exception) {
+	public PacketSender start(Consumer<Exception> exception) {
 		try {
 			if(!runned) {
 				setState(PacketSenderState.STARTING);
@@ -33,7 +33,7 @@ public class PacketSender {
 			JSAUtils.error(e, type, JSALogType.WARN, null);
 			exception.accept(e);
 		}
-		return runned;
+		return this;
 	}
 	
 	public PacketSenderState getState() {return state;}

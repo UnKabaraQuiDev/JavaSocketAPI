@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import lu.poucy.jsa.JSA;
 import lu.poucy.jsa.exceptions.KeyToShortException;
 import lu.poucy.jsa.packets.Packet;
+import lu.poucy.jsa.packets.sender.PacketSender;
 import lu.poucy.jsa.utils.Pair;
 
 public class PreparedPacket {
@@ -29,9 +30,9 @@ public class PreparedPacket {
 	public PreparedPacket setPort(int port) {this.port = port;return this;}
 	public Packet getPacket() {return packet;}
 	
-	public void send(JSA server) {server.write(this).start((e) -> e.printStackTrace());}
+	public PacketSender send(JSA server) {return server.write(this).start((e) -> e.printStackTrace());}
 
-	public String crypt(char[] key) throws KeyToShortException {
+	public String crypt(int[] key) throws KeyToShortException {
 		if(key.length <= 3)
 			throw new KeyToShortException(key);
 		
@@ -43,7 +44,7 @@ public class PreparedPacket {
 		
 		for(int i = 0; i < p.length(); i++) {
 			//System.out.println(i+" : "+key.length+" : "+round(i % key.length)+" : "+Integer.valueOf(key[round(i % key.length)]+"")+" : "+getAlpha(p.toCharArray()[i]+"")+" : "+(getAlpha(p.toCharArray()[i]+"")+Integer.valueOf(key[round(i % key.length)]+"")));
-			pro += getAlpha(p.toCharArray()[i]+"")+Integer.valueOf(key[round(i % key.length)]+"");
+			pro += getAlpha(p.toCharArray()[i]+"")+key[round(i % key.length)];
 			if(i != (p.length()-1))
 				pro += ";";
 		}
@@ -53,14 +54,14 @@ public class PreparedPacket {
 		return ret.toString();
 	}
 	
-	public static Packet decrypt(JSONObject obj, char[] key) {
+	public static Packet decrypt(JSONObject obj, int[] key) {
 		String str = obj.getString("packet");
 		String[] _str = str.split(";");
 		str = "";
 		
 		for (int i = 0; i < _str.length; i++) {
 			//System.out.println(Integer.valueOf(_str[i])-Integer.valueOf(key[round(i % key.length)]+""));
-			str += getChar(Integer.valueOf(_str[i])-Integer.valueOf(key[round(i % key.length)]+""));
+			str += getChar(Integer.valueOf(_str[i])-key[round(i % key.length)]);
 		}
 		
 		obj = new JSONObject(str);
