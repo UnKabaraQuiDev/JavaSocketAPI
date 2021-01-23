@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import lu.poucy.jsa.JSA;
 import lu.poucy.jsa.exceptions.IllegalJSAClientState;
+import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
 import lu.poucy.jsa.packets.Packet;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
@@ -49,7 +50,7 @@ public class JSAClient implements JSA {
 					while(!socket.isClosed()) {
 						try {
 							read();
-						} catch (IOException e) {
+						} catch (IOException | InvalidKeyException e) {
 							if(e.getLocalizedMessage() != "Socket closed")
 								JSAUtils.error(e, JSAType.CLIENT, JSALogType.CRITICAL, socket);
 						}
@@ -81,7 +82,7 @@ public class JSAClient implements JSA {
 		);
 		return sender;
 	}
-	public void read() throws IOException {
+	public void read() throws IOException, InvalidKeyException {
 		Socket read = socket.accept();
 		Scanner s = new Scanner(read.getInputStream()).useDelimiter("\\A");
 		String in = s.hasNext() ? s.next() : "";

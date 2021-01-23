@@ -3,9 +3,11 @@ package lu.poucy.jsa.packets.prepared;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import lu.poucy.jsa.JSA;
+import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
 import lu.poucy.jsa.packets.Packet;
 import lu.poucy.jsa.packets.sender.PacketSender;
@@ -54,22 +56,25 @@ public class PreparedPacket {
 		return ret.toString();
 	}
 	
-	public static Packet decrypt(JSONObject obj, int[] key) {
-		String str = obj.getString("packet");
-		String[] _str = str.split(";");
-		str = "";
-		
-		for (int i = 0; i < _str.length; i++) {
-			//System.out.println(Integer.valueOf(_str[i])-Integer.valueOf(key[round(i % key.length)]+""));
-			str += getChar(Integer.valueOf(_str[i])-key[round(i % key.length)]);
+	public static Packet decrypt(JSONObject obj, int[] key) throws InvalidKeyException {
+		try {
+			String str = obj.getString("packet");
+			String[] _str = str.split(";");
+			str = "";
+			
+			for (int i = 0; i < _str.length; i++) {
+				//System.out.println(Integer.valueOf(_str[i])-Integer.valueOf(key[round(i % key.length)]+""));
+				str += getChar(Integer.valueOf(_str[i])-key[round(i % key.length)]);
+			}
+			
+			obj = new JSONObject(str);
+			Packet p = new Packet(new ArrayList<>());
+			for(String o : obj.keySet())
+				p.addArg(new Pair<String, Object>(o, obj.get(o)));
+			return p;
+		}catch(JSONException exc) {
+			throw new InvalidKeyException(key);
 		}
-		
-		obj = new JSONObject(str);
-		Packet p = new Packet(new ArrayList<>());
-		for(String o : obj.keySet())
-			p.addArg(new Pair<String, Object>(o, obj.get(o)));
-		return p;
-		
 	}
 	
 	public static String[] alpha = "0123456789.,;:?!§/*-+&\"'(-_)=&~#{[|`\\^@]}$*ù%µ£¨ù*¤ ²<>azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBNèêëïîôöùûüÿçæÆŒÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸàâäé".split("");

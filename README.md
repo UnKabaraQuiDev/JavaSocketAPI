@@ -2,7 +2,7 @@
 
 JSA is a packet-based communication system in Java
 
-# Summary
+## Summary
 
 1. [Introduction](#introduction)
 2. [Create a server](#create-a-server)
@@ -15,7 +15,7 @@ JSA is a packet-based communication system in Java
 
 ## Introduction
 
-All packets sent are encrypted with a key that has been passed as an argument in the constructor when the server/client is started.
+All packets sent are encrypted with a key that is been passed as an argument in the constructor when the server/client is started.
 Each server/client has its own port which has also been passed as an argument in the constructor, each port can only be used by one server/client.
 It's possible to add listeners to servers/clients, listeners contain methods (`onPacketSended`, `onPacketReceived`) which are called when a packet is sented or received by the server on which the listener is registered.
 
@@ -23,7 +23,7 @@ It's possible to add listeners to servers/clients, listeners contain methods (`o
 
 Create a server:
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new int[] {1,2,3,4,5,6,7,8,9,0});
 ```
 The first argument of the constructor is the port on which the server will listen, and also the port it will use to send packets, the second is the key that will be used to encrypt and decrypt the packets.
 
@@ -31,7 +31,7 @@ The first argument of the constructor is the port on which the server will liste
 
 Create a client:
 ```java
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new int[] {1,2,3,4,5,6,7,8,9,0});
 ```
 The first argument of the constructor is the port on which the client will listen, and also the port it will use to send packets, the second is the key that will be used to encrypt and decrypt the packets.
 
@@ -46,6 +46,7 @@ Packet packet = new lu.poucy.jsa.packets.Packet(java.utils.Arrays.asList(
 	new lu.poucy.jsa.utils.Pair<String, Object>("object", new java.lang.Object())
 ));
 ```
+
 **or**
 ```java
 java.utils.List<lu.poucy.jsa.utils.Pair<String, Object>> args = new java.utils.ArrayList<>();
@@ -70,8 +71,8 @@ A PreparedPacket is an intermediate step between creating the packet, and sendin
 
 Send a packet:
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
 
 PreparedPacket ppacket = new PreparedPacket(new Packet(new ArrayList()), server.getHost(), server.getPort());
 
@@ -81,10 +82,11 @@ To send a packet, the PreparedPacket class contains a `send` function, the argum
 This function returns a PacketSender which allows to start sending the packet, with the function `start`, the argument of this function is a functional interface, which will be called if an exception occurs.
 The `send` function in PreparedPacket automatically starts sending the packet.
 Each PacketSender can only be used once.
+
 **or**
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
 
 PreparedPacket ppacket = new PreparedPacket(new Packet(new ArrayList()), server.getHost(), server.getPort());
 
@@ -112,8 +114,8 @@ public class CustomListener implements lu.poucy.jsa.utils.JSAListener {
 JSAListener serverListener = new CustomListener();
 JSAListener clientListener = new CustomListener();
 
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
 
 
 server.registerListener(serverListener);
@@ -129,6 +131,7 @@ It is possible to add listeners to the servers/clients, the functions `registerL
 ## Create a custom packet
 
 Create a custom packet:
+
 **Exemple**
 ```java
 public class CarPacket extends lu.poucy.jsa.packets.Packet {
@@ -162,8 +165,8 @@ public class CustomListener implements lu.poucy.jsa.utils.JSAListener {
 JSAListener serverListener = new CustomListener();
 JSAListener clientListener = new CustomListener();
 
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {'1','2','3','4','5','6','7','8','9','0'});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
 
 server.registerListener(serverListener);
 client.registerListener(clientListener);
