@@ -13,16 +13,20 @@ import lu.poucy.jsa.utils.Pair;
 
 public class JSATestMain {
 
+	public static Object obj;
+	
 	public static void main(String[] args) throws IllegalJSAServerState, IOException, KeyToShortException, IllegalJSAClientState {
 		
 		JSAServer server = new JSAServer(3000, new int[] {1,2,3,4,5,6,7,8,9,0});
-		JSAClient client = new JSAClient(3001, new int[] {1,9,8,7,6,5,4,3,2,0});
+		JSAClient client = new JSAClient(3001, new int[] {1,2,3,4,5,6,7,8,9,0});
 		
 		Packet p = new Packet(Arrays.asList(new Pair<String, Object>("test", "test2")));
 		PreparedPacket pp = new PreparedPacket(p, server.getHost(), server.getPort());
 		
 		System.out.println(p);
 		System.out.println(pp.crypt(new int[] {1,2,3,4,5,6,7,8,9,0}));
+		
+		obj = new Object();
 		
 		client.registerListener(new JSAListener() {
 			@Override
