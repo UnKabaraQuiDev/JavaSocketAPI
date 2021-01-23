@@ -46,6 +46,7 @@ Packet packet = new lu.poucy.jsa.packets.Packet(java.utils.Arrays.asList(
 	new lu.poucy.jsa.utils.Pair<String, Object>("object", new java.lang.Object())
 ));
 ```
+
 **or**
 ```java
 java.utils.List<lu.poucy.jsa.utils.Pair<String, Object>> args = new java.utils.ArrayList<>();
@@ -81,6 +82,7 @@ To send a packet, the PreparedPacket class contains a `send` function, the argum
 This function returns a PacketSender which allows to start sending the packet, with the function `start`, the argument of this function is a functional interface, which will be called if an exception occurs.
 The `send` function in PreparedPacket automatically starts sending the packet.
 Each PacketSender can only be used once.
+
 **or**
 ```java
 JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {'1','2','3','4','5','6','7','8','9','0'});
@@ -129,6 +131,7 @@ It is possible to add listeners to the servers/clients, the functions `registerL
 ## Create a custom packet
 
 Create a custom packet:
+
 **Exemple**
 ```java
 public class CarPacket extends lu.poucy.jsa.packets.Packet {
