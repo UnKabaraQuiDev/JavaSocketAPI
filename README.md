@@ -136,6 +136,9 @@ server.unregisterListener(serverListener);
 client.unregisterListener(clientListener);
 ```
 It is possible to add listeners to the servers/clients, the functions `registerListener` and `unregisterListener` are used to register or unregister JSAListeners.
+The two function:
+* `onPacketReceived(Packet packet)`: This function is called when the serveror the client received a packet.
+* `onPacketSended(Packet packet)`: This function is called when the server or the client send a packet.
 
 ## Create a custom packet
 
