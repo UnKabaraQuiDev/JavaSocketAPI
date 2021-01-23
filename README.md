@@ -15,29 +15,33 @@ JSA is a packet-based communication system in Java
 
 ## Introduction
 
-All packets sent are encrypted with a key that is been passed as an argument in the constructor when the server/client is started.
-Each server/client has its own port which has also been passed as an argument in the constructor, each port can only be used by one server/client.
+This package includes a client/server solution to transfer series of key/values.
+Encryption is based on a symetric key for variable offset. 
+
+Each server/client has its own port which has been passed as an argument in the constructor, each port can only be used by one server/client.
 It's possible to add listeners to servers/clients, listeners contain methods (`onPacketSended`, `onPacketReceived`) which are called when a packet is sented or received by the server on which the listener is registered.
 
 ## Create a server
 
-Create a server:
+Server side instantiation:
 ```java
 JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new int[] {1,2,3,4,5,6,7,8,9,0});
 ```
-The first argument of the constructor is the port on which the server will listen, and also the port it will use to send packets, the second is the key that will be used to encrypt and decrypt the packets.
+Arguments of the server's constructor are:
+1. The TCP-port on which the server has to listen,
+2. The key to encrypt communications (array of minimum 4 numeric values)
 
 ## Create a client
 
-Create a client:
+Client side instantiation:
 ```java
 JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new int[] {1,2,3,4,5,6,7,8,9,0});
 ```
-The first argument of the constructor is the port on which the client will listen, and also the port it will use to send packets, the second is the key that will be used to encrypt and decrypt the packets.
+Arguments of the client's constructor are the same as the server. ([Here...](#create-a-server))
 
 ## Create a packet
 
-Create a packet:
+Packet instantiation:
 ```java
 Packet packet = new lu.poucy.jsa.packets.Packet(java.utils.Arrays.asList(
 	new lu.poucy.jsa.utils.Pair<String, Object>("string", "value"),
@@ -57,19 +61,24 @@ args.add(new lu.poucy.jsa.utils.Pair<String, Object>("object", new java.lang.Obj
 
 Packet packet = new lu.poucy.jsa.packets.Packet(args);
 ```
-A packet contains a list of peers, each of which consists of a text key and a value. The packet acts as a HashMap.
+A packet consists of a list of pairs of a text key and any kind of value.
+The value can be text, numeric and event an object. 
 
 ## Prepare a packet
 
-Prepare a packet:
+Packet preparation:
 ```java
 PreparedPacket ppacket = new PreparedPacket(new Packet(new ArrayList()), InetAddress.getHost("localhost"), 3000);
 ```
-A PreparedPacket is an intermediate step between creating the packet, and sending it. The first argument is the packet that will be sent, the second is the address to which it will be sent, and the third is the port to which it will be sent.
+A PreparedPacket is an intermediate step between creating the packet, and sending it.
+Arguments are:
+1. The packet to be sent
+2. The target ip-address
+3. The target TCP-port
 
 ## Send a packet
 
-Send a packet:
+Packet transmission:
 ```java
 JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
 JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
@@ -99,7 +108,7 @@ Each PacketSender can only be used once.
 
 ## Listeners
 
-Register a listener:
+JSAListeners:
 ```java
 public class CustomListener implements lu.poucy.jsa.utils.JSAListener {
 	public void onPacketReceived(Packet packet) {
