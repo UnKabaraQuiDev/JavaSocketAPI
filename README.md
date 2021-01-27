@@ -62,7 +62,7 @@ args.add(new lu.poucy.jsa.utils.Pair<String, Object>("object", new java.lang.Obj
 Packet packet = new lu.poucy.jsa.packets.Packet(args);
 ```
 A packet consists of a list of pairs of a text key and any kind of value.
-The value can be text, numeric and event an object. 
+The value can be text, numeric and even an object. 
 
 ## Prepare a packet
 
