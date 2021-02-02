@@ -2,6 +2,7 @@ package lu.poucy.jsa.client;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,11 +22,8 @@ import lu.poucy.jsa.packets.sender.PacketSender;
 import lu.poucy.jsa.packets.sender.PacketSenderRunnable;
 import lu.poucy.jsa.packets.sender.PacketSenderState;
 import lu.poucy.jsa.utils.JSAListener;
-import lu.poucy.jsa.utils.JSAUtils;
-import lu.poucy.jsa.utils.JSAUtils.JSALogType;
-import lu.poucy.jsa.utils.JSAUtils.JSAType;
 
-public class JSAClient implements JSA {
+public class JSAClient implements JSA<Void> {
 
 	private List<JSAListener> listeners = new ArrayList<>();
 	
@@ -36,11 +34,13 @@ public class JSAClient implements JSA {
 	public JSAClient(int port, int[] key) throws IllegalJSAClientState, IOException, KeyToShortException {
 		if(key.length <= 3)
 			throw new KeyToShortException(key);
-		if(socket != null)
-			throw new IllegalJSAClientState("Client already starter on port: "+this.port);
 		
 		this.port = port;
-		this.socket = new ServerSocket(this.port);
+		try {
+			this.socket = new ServerSocket(this.port);
+		}catch(BindException e) {
+			throw new IllegalJSAClientState("A client is already started on port: "+this.port);
+		}
 		this.key = key;
 		
 		new Thread(
@@ -52,7 +52,7 @@ public class JSAClient implements JSA {
 							read();
 						} catch (IOException | InvalidKeyException e) {
 							if(e.getLocalizedMessage() != "Socket closed")
-								JSAUtils.error(e, JSAType.CLIENT, JSALogType.CRITICAL, socket);
+								JSA.error(e, JSAType.CLIENT, JSALogType.CRITICAL, socket);
 						}
 					}
 				}
@@ -82,13 +82,16 @@ public class JSAClient implements JSA {
 		);
 		return sender;
 	}
-	public void read() throws IOException, InvalidKeyException {
+	@SuppressWarnings("resource")
+	public Void read() throws IOException, InvalidKeyException {
 		Socket read = socket.accept();
 		Scanner s = new Scanner(read.getInputStream()).useDelimiter("\\A");
 		String in = s.hasNext() ? s.next() : "";
 		Packet p = PreparedPacket.decrypt(new JSONObject(in), key);
 		for(JSAListener l : listeners)
 			l.onPacketReceived(p);
+		s.close();
+		return null;
 	}
 	
 	public void registerListener(JSAListener listener) {if(!listeners.contains(listener)) listeners.add(listener);}
@@ -97,6 +100,7 @@ public class JSAClient implements JSA {
 	public InetAddress getHost() {return socket.getInetAddress();}
 	public int getPort() {return port;}
 	
+	@Override
 	public void close() throws IOException {socket.close();}
 	
 }

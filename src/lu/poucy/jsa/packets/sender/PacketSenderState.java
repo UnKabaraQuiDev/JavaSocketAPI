@@ -1,6 +1,7 @@
 package lu.poucy.jsa.packets.sender;
 
 public enum PacketSenderState {
+	BEFORE("Not started"),
 	UNKNOWN("Unknown"),
 	STARTING("Starting"),
 	ALIVE("Alive"),

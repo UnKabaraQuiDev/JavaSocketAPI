@@ -10,7 +10,6 @@ import lu.poucy.jsa.JSA;
 import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
 import lu.poucy.jsa.packets.Packet;
-import lu.poucy.jsa.packets.sender.PacketSender;
 import lu.poucy.jsa.utils.Pair;
 
 public class PreparedPacket {
@@ -32,7 +31,7 @@ public class PreparedPacket {
 	public PreparedPacket setPort(int port) {this.port = port;return this;}
 	public Packet getPacket() {return packet;}
 	
-	public PacketSender send(JSA server) {return server.write(this).start((e) -> e.printStackTrace());}
+	public Thread send(JSA<?> jsa) {return jsa.write(this).start((e) -> e.printStackTrace());}
 
 	public String crypt(int[] key) throws KeyToShortException {
 		if(key.length <= 3)

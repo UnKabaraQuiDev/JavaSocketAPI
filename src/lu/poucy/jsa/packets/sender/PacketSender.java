@@ -2,15 +2,16 @@ package lu.poucy.jsa.packets.sender;
 
 import java.util.function.Consumer;
 
-import lu.poucy.jsa.utils.JSAUtils;
-import lu.poucy.jsa.utils.JSAUtils.JSALogType;
-import lu.poucy.jsa.utils.JSAUtils.JSAType;
+import lu.poucy.jsa.JSA;
+import lu.poucy.jsa.JSA.JSALogType;
+import lu.poucy.jsa.JSA.JSAType;
+import lu.poucy.jsa.exceptions.PacketSenderAlreadyUsedException;
 
 public class PacketSender {
 
 	private PacketSenderState state = PacketSenderState.UNKNOWN;
+	private boolean used = false;
 	
-	private boolean runned = false;
 	private PacketSenderRunnable psr;
 	
 	private JSAType type;
@@ -18,22 +19,30 @@ public class PacketSender {
 	public PacketSender(PacketSenderRunnable packetSenderRunnable, JSAType type) {
 		this.psr = packetSenderRunnable;
 		this.type = type;
+		setState(PacketSenderState.BEFORE);
 	}
 	
-	public PacketSender start(Consumer<Exception> exception) {
-		try {
-			if(!runned) {
-				setState(PacketSenderState.STARTING);
-				psr.run(this);
-				runned = true;
-				setState(PacketSenderState.STOPPED);
-			}
-		} catch (Exception e) {
-			setState(PacketSenderState.ERROR);
-			JSAUtils.error(e, type, JSALogType.WARN, null);
-			exception.accept(e);
+	public Thread start(Consumer<Exception> exception) {
+		PacketSender t = this;
+		if(!used) {
+			used = true;
+			Thread th = new Thread(() -> {
+				try {
+					setState(PacketSenderState.STARTING);
+					psr.run(t);
+					setState(PacketSenderState.STOPPED);
+				} catch (Exception e) {
+					setState(PacketSenderState.ERROR);
+					JSA.error(e, type, JSALogType.WARN, null);
+					exception.accept(e);
+				}
+			});
+			th.start();
+			return th;
+		}else {
+			JSA.error(new PacketSenderAlreadyUsedException(state, psr, type, this), type, JSALogType.WARN, null);
+			return null;
 		}
-		return this;
 	}
 	
 	public PacketSenderState getState() {return state;}
