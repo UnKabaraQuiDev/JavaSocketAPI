@@ -14,6 +14,7 @@ import lu.poucy.jsa.exceptions.IllegalJSAServerState;
 import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
+import lu.poucy.jsa.packets.received.PacketChannel;
 import lu.poucy.jsa.packets.sender.PacketSender;
 import lu.poucy.jsa.packets.sender.PacketSenderRunnable;
 import lu.poucy.jsa.packets.sender.PacketSenderState;
@@ -65,7 +66,7 @@ public class JSAServer implements JSA<Thread> {
 					Socket socket = new Socket(ppacket.getHost(), ppacket.getPort());
 					sender.setState(PacketSenderState.ALIVE);
 					for(JSAListener l : listeners)
-						l.onPacketSended(ppacket.getPacket());
+						l.onPacketSended(new PacketChannel(ppacket.getPacket(), socket, key));
 					PrintWriter w = new PrintWriter(socket.getOutputStream());
 					w.write(ppacket.crypt(key));
 					w.flush();

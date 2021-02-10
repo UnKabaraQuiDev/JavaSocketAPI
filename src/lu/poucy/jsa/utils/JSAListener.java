@@ -1,8 +1,8 @@
 package lu.poucy.jsa.utils;
 
-import lu.poucy.jsa.packets.Packet;
+import lu.poucy.jsa.packets.received.PacketChannel;
 
 public interface JSAListener {
-	void onPacketReceived(Packet packet);
-	void onPacketSended(Packet packet);
+	void onPacketReceived(PacketChannel p);
+	void onPacketSended(PacketChannel packet);
 }

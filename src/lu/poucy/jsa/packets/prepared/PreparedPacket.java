@@ -31,9 +31,10 @@ public class PreparedPacket {
 	public PreparedPacket setPort(int port) {this.port = port;return this;}
 	public Packet getPacket() {return packet;}
 	
-	public Thread send(JSA<?> jsa) {return jsa.write(this).start((e) -> e.printStackTrace());}
-
-	public String crypt(int[] key) throws KeyToShortException {
+	public Thread send(JSA<?> jsa) {return jsa.write(this).start((e) -> e.printStackTrace(), null);}
+	public String crypt(int[] key) throws KeyToShortException {return Crypt(packet, key);}
+	
+	public static String Crypt(Packet packet, int[] key) throws KeyToShortException {
 		if(key.length <= 3)
 			throw new KeyToShortException(key);
 		
@@ -55,7 +56,7 @@ public class PreparedPacket {
 		return ret.toString();
 	}
 	
-	public static Packet decrypt(JSONObject obj, int[] key) throws InvalidKeyException {
+	public static Packet Decrypt(JSONObject obj, int[] key) throws InvalidKeyException {
 		try {
 			String str = obj.getString("packet");
 			String[] _str = str.split(";");

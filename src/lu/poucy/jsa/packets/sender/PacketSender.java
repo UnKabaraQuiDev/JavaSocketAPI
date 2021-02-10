@@ -22,7 +22,8 @@ public class PacketSender {
 		setState(PacketSenderState.BEFORE);
 	}
 	
-	public Thread start(Consumer<Exception> exception) {
+	public Thread start(Consumer<Exception> exception,
+			Consumer<PacketSender> success) {
 		PacketSender t = this;
 		if(!used) {
 			used = true;
@@ -31,10 +32,13 @@ public class PacketSender {
 					setState(PacketSenderState.STARTING);
 					psr.run(t);
 					setState(PacketSenderState.STOPPED);
+					if(success != null)
+						success.accept(this);
 				} catch (Exception e) {
 					setState(PacketSenderState.ERROR);
 					JSA.error(e, type, JSALogType.WARN, null);
-					exception.accept(e);
+					if(exception != null)
+						exception.accept(e);
 				}
 			});
 			th.start();

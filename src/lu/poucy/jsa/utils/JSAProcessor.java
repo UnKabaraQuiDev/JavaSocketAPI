@@ -1,4 +1,4 @@
-package lu.poucy.jsa;
+package lu.poucy.jsa.utils;
 
 import java.io.IOException;
 
