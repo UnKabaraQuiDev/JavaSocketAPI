@@ -13,6 +13,7 @@ import lu.poucy.jsa.JSA;
 import lu.poucy.jsa.exceptions.IllegalJSAServerState;
 import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
+import lu.poucy.jsa.packets.prepared.PacketCrypter;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
 import lu.poucy.jsa.packets.received.PacketChannel;
 import lu.poucy.jsa.packets.sender.PacketSender;
@@ -25,9 +26,14 @@ public class JSAServer implements JSA<Thread> {
 	private List<JSAListener> listeners = new ArrayList<>();
 	private List<PacketSender> createdSenders = new ArrayList<>();
 	
+	private Thread th;
+	
 	private ServerSocket socket;
 	private int port = 0;
 	private int[] key;
+	private JSA<?> instance;
+	
+	private PacketCrypter pc = PacketCrypter.DEFAULT;
 	
 	public JSAServer(int port, int[] key) throws IllegalJSAServerState, IOException, KeyToShortException {
 		if(key.length <= 3)
@@ -41,7 +47,7 @@ public class JSAServer implements JSA<Thread> {
 		}
 		this.key = key;
 		
-		new Thread(
+		th = new Thread(
 			new Runnable() {
 				@Override
 				public void run() {
@@ -55,7 +61,10 @@ public class JSAServer implements JSA<Thread> {
 					}
 				}
 			}
-		).start();
+		);
+		th.setName(this.getClass().getCanonicalName()+"-"+port);
+		th.start();
+		instance = this;
 	}
 	
 	public PacketSender write(PreparedPacket ppacket) {
@@ -66,9 +75,9 @@ public class JSAServer implements JSA<Thread> {
 					Socket socket = new Socket(ppacket.getHost(), ppacket.getPort());
 					sender.setState(PacketSenderState.ALIVE);
 					for(JSAListener l : listeners)
-						l.onPacketSended(new PacketChannel(ppacket.getPacket(), socket, key));
+						l.onPacketSended(new PacketChannel(ppacket.getPacket(), socket, key, instance));
 					PrintWriter w = new PrintWriter(socket.getOutputStream());
-					w.write(ppacket.crypt(key));
+					w.write(pc.Crypt(ppacket.getPacket(), key));
 					w.flush();
 					sender.setState(PacketSenderState.ENDING);
 					socket.close();
@@ -81,7 +90,7 @@ public class JSAServer implements JSA<Thread> {
 		return sender;
 	}
 	public Thread read() throws IOException, InvalidKeyException {
-		return new ServerSideClientProcessor(socket.accept(), getListeners(), key);
+		return new ServerSideClientProcessor(socket.accept(), getListeners(), key, instance);
 	}
 	
 	public void registerListener(JSAListener listener) {if(!listeners.contains(listener)) listeners.add(listener);}
@@ -91,7 +100,12 @@ public class JSAServer implements JSA<Thread> {
 	public int getPort() {return port;}
 	public List<PacketSender> getCreatedSenders() {return createdSenders;}
 	public List<JSAListener> getListeners() {return listeners;}
+	public Thread getThread() {return th;}
 	
+	@Override
+	public PacketCrypter getPacketCrypter() {return pc;}
+	@Override
+	public void setPacketCrypter(PacketCrypter pc) {this.pc = pc;}
 	@Override
 	public void close() throws IOException {socket.close();}
 	

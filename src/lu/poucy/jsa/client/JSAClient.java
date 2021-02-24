@@ -16,6 +16,7 @@ import lu.poucy.jsa.JSA;
 import lu.poucy.jsa.exceptions.IllegalJSAClientState;
 import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
+import lu.poucy.jsa.packets.prepared.PacketCrypter;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
 import lu.poucy.jsa.packets.received.PacketChannel;
 import lu.poucy.jsa.packets.sender.PacketSender;
@@ -27,9 +28,12 @@ public class JSAClient implements JSA<Void> {
 
 	private List<JSAListener> listeners = new ArrayList<>();
 	
+	private Thread th;
 	private ServerSocket socket;
 	private int port = 0;
 	private int[] key;
+	private PacketCrypter pc;
+	private JSA<?> instance;
 	
 	public JSAClient(int port, int[] key) throws IllegalJSAClientState, IOException, KeyToShortException {
 		if(key.length <= 3)
@@ -43,7 +47,7 @@ public class JSAClient implements JSA<Void> {
 		}
 		this.key = key;
 		
-		new Thread(
+		th = new Thread(
 			new Runnable() {
 				@Override
 				public void run() {
@@ -52,12 +56,15 @@ public class JSAClient implements JSA<Void> {
 							read();
 						} catch (IOException | InvalidKeyException e) {
 							if(e.getLocalizedMessage() != "Socket closed")
-								JSA.error(e, JSAType.CLIENT, JSALogType.CRITICAL, socket);
+								JSA.error(e, JSAType.SERVER, JSALogType.CRITICAL, socket);
 						}
 					}
 				}
 			}
-		).start();
+		);
+		th.setName(this.getClass().getCanonicalName()+"-"+port);
+		th.start();
+		instance = this;
 	}
 	
 	public PacketSender write(PreparedPacket ppacket) {
@@ -69,9 +76,9 @@ public class JSAClient implements JSA<Void> {
 					Socket socket = new Socket(ppacket.getHost(), ppacket.getPort());
 					sender.setState(PacketSenderState.ALIVE);
 					for(JSAListener l : listeners)
-						l.onPacketSended(new PacketChannel(ppacket.getPacket(), socket, key));
+						l.onPacketSended(new PacketChannel(ppacket.getPacket(), socket, key, instance));
 					PrintWriter w = new PrintWriter(socket.getOutputStream());
-					w.write(ppacket.crypt(key));
+					w.write(pc.Crypt(ppacket.getPacket(), key));
 					w.flush();
 					sender.setState(PacketSenderState.ENDING);
 					socket.close();
@@ -87,7 +94,7 @@ public class JSAClient implements JSA<Void> {
 		Socket read = socket.accept();
 		Scanner s = new Scanner(read.getInputStream()).useDelimiter("\\A");
 		String in = s.hasNext() ? s.next() : "";
-		PacketChannel p = new PacketChannel(PreparedPacket.Decrypt(new JSONObject(in), key), read, key);
+		PacketChannel p = new PacketChannel(pc.Decrypt(new JSONObject(in), key), read, key, instance);
 		for(JSAListener l : listeners)
 			l.onPacketReceived(p);
 		s.close();
@@ -96,11 +103,15 @@ public class JSAClient implements JSA<Void> {
 	
 	public void registerListener(JSAListener listener) {if(!listeners.contains(listener)) listeners.add(listener);}
 	public void unregisterListener(JSAListener listener) {if(listeners.contains(listener)) listeners.remove(listener);}
-	
+	public Thread getThread() {return th;}
 	public InetAddress getHost() {return socket.getInetAddress();}
 	public int getPort() {return port;}
 	
 	@Override
 	public void close() throws IOException {socket.close();}
+	@Override
+	public PacketCrypter getPacketCrypter() {return pc;}
+	@Override
+	public void setPacketCrypter(PacketCrypter pc) {this.pc = pc;}
 	
 }

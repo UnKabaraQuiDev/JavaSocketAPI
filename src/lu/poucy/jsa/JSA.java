@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import lu.poucy.jsa.exceptions.InvalidKeyException;
+import lu.poucy.jsa.packets.prepared.PacketCrypter;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
 import lu.poucy.jsa.packets.sender.PacketSender;
 
@@ -14,6 +15,8 @@ public interface JSA<T> {
 	PacketSender write(PreparedPacket ppacket);
 	T read() throws IOException, InvalidKeyException;
 	void close() throws IOException;
+	PacketCrypter getPacketCrypter();
+	void setPacketCrypter(PacketCrypter pc);
 	
 	public static void error(Exception e, JSAType type, JSALogType log, ServerSocket sock) {
 		//String s = "";
