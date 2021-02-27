@@ -10,6 +10,10 @@ import lu.poucy.jsa.packets.prepared.PacketCrypter;
 import lu.poucy.jsa.packets.prepared.PreparedPacket;
 import lu.poucy.jsa.packets.sender.PacketSender;
 
+/**
+ * @author Poucy113
+ * <a>https://github.com/Poucy113/JavaSocketAPI</a>
+ */
 public interface JSA<T> {
 	
 	PacketSender write(PreparedPacket ppacket);

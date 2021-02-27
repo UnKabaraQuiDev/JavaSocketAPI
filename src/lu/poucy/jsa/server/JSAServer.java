@@ -21,6 +21,10 @@ import lu.poucy.jsa.packets.sender.PacketSenderRunnable;
 import lu.poucy.jsa.packets.sender.PacketSenderState;
 import lu.poucy.jsa.utils.JSAListener;
 
+/**
+ * @author Poucy113
+ * <p>JSA Server class <a>https://github.com/Poucy113/JavaSocketAPI</a></p>
+ */
 public class JSAServer implements JSA<Thread> {
 
 	private List<JSAListener> listeners = new ArrayList<>();
