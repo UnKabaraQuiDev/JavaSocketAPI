@@ -35,7 +35,7 @@ public class JSAServer implements JSA<Thread> {
 	private ServerSocket socket;
 	private int port = 0;
 	private int[] key;
-	private JSA<?> instance;
+	private JSA<Thread> instance;
 	
 	private PacketCrypter pc = PacketCrypter.DEFAULT;
 	

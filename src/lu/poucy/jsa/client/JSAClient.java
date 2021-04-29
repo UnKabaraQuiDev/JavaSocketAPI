@@ -36,8 +36,9 @@ public class JSAClient implements JSA<Void> {
 	private ServerSocket socket;
 	private int port = 0;
 	private int[] key;
-	private PacketCrypter pc;
-	private JSA<?> instance;
+	private JSA<Void> instance;
+	
+	private PacketCrypter pc = PacketCrypter.DEFAULT;
 	
 	public JSAClient(int port, int[] key) throws IllegalJSAClientState, IOException, KeyToShortException {
 		if(key.length <= 3)
