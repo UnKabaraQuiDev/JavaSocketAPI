@@ -25,7 +25,7 @@ It's possible to add listeners to servers/clients, listeners contain methods (`o
 
 Server side instantiation:
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new int[] {1,2,3,4,5,6,7,8,9,0});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new int[] {1,2,3,4,5,6,7,8,9,0}).open();
 ```
 Arguments of the server's constructor are:
 1. The TCP-port on which the server has to listen,
@@ -35,7 +35,7 @@ Arguments of the server's constructor are:
 
 Client side instantiation:
 ```java
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new int[] {1,2,3,4,5,6,7,8,9,0});
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new int[] {1,2,3,4,5,6,7,8,9,0}).open();
 ```
 Arguments of the client's constructor are the same as the server. ([Here...](#create-a-server))
 
@@ -80,8 +80,8 @@ Arguments are:
 
 Packet transmission:
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
 
 PreparedPacket ppacket = new PreparedPacket(new Packet(new ArrayList()), server.getHost(), server.getPort());
 
@@ -94,8 +94,8 @@ Each PacketSender can only be used once.
 
 **or**
 ```java
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
 
 PreparedPacket ppacket = new PreparedPacket(new Packet(new ArrayList()), server.getHost(), server.getPort());
 
@@ -123,9 +123,8 @@ public class CustomListener implements lu.poucy.jsa.utils.JSAListener {
 JSAListener serverListener = new CustomListener();
 JSAListener clientListener = new CustomListener();
 
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
-
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
 
 server.registerListener(serverListener);
 client.registerListener(clientListener);
@@ -177,8 +176,8 @@ public class CustomListener implements lu.poucy.jsa.utils.JSAListener {
 JSAListener serverListener = new CustomListener();
 JSAListener clientListener = new CustomListener();
 
-JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0});
-JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0});
+JSAServer server = new lu.poucy.jsa.server.JSAServer(3000, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
+JSAClient client = new lu.poucy.jsa.client.JSAClient(3001, new char[] {1,2,3,4,5,6,7,8,9,0}).open();
 
 server.registerListener(serverListener);
 client.registerListener(clientListener);
