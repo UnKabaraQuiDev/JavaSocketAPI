@@ -122,7 +122,7 @@ public class JSAServer implements JSA<Thread> {
 			return;
 		}
 		throw new IllegalJSAClientState("Client isn't started, unable to close");
-	}
+	} 
 	
 	@Override
 	public PacketCrypter getPacketCrypter() {return pc;}

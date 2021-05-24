@@ -48,7 +48,7 @@ public class JSAClient implements JSA<Void> {
 		this.key = key;
 		
 		instance = this;
-	}
+	} 
 	
 	@Override
 	public JSA<Void> open() throws Exception {
