@@ -45,31 +45,39 @@ public class JSAClient implements JSA<Void> {
 			throw new KeyToShortException(key);
 		
 		this.port = port;
+		this.key = key;
+		
+		instance = this;
+	}
+	
+	@Override
+	public JSA<Void> open() throws Exception {
 		try {
 			this.socket = new ServerSocket(this.port);
 		}catch(BindException e) {
 			throw new IllegalJSAClientState("A client is already started on port: "+this.port);
+		}catch(IOException e) {
+			throw e;
 		}
-		this.key = key;
 		
 		th = new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					while(!socket.isClosed()) {
-						try {
-							read();
-						} catch (IOException | InvalidKeyException e) {
-							if(e.getLocalizedMessage() != "Socket closed")
-								JSA.error(e, JSAType.SERVER, JSALogType.CRITICAL, socket);
+				new Runnable() {
+					@Override
+					public void run() {
+						while(!socket.isClosed()) {
+							try {
+								read();
+							} catch (IOException | InvalidKeyException e) {
+								if(e.getLocalizedMessage() != "Socket closed")
+									JSA.error(e, JSAType.SERVER, JSALogType.CRITICAL, socket);
+							}
 						}
 					}
 				}
-			}
-		);
-		th.setName(this.getClass().getCanonicalName()+"-"+port);
-		th.start();
-		instance = this;
+			);
+			th.setName(this.getClass().getCanonicalName()+"-"+port);
+			th.start();
+		return instance;
 	}
 	
 	public PacketSender write(PreparedPacket ppacket) {
@@ -113,10 +121,18 @@ public class JSAClient implements JSA<Void> {
 	public int getPort() {return port;}
 	
 	@Override
-	public void close() throws IOException {socket.close();}
+	public void close() throws Exception {
+		if(socket != null) {
+			socket.close();
+			return;
+		}
+		throw new IllegalJSAClientState("Client isn't started, unable to close");
+	}
 	@Override
 	public PacketCrypter getPacketCrypter() {return pc;}
 	@Override
 	public void setPacketCrypter(PacketCrypter pc) {this.pc = pc;}
-	
+	@Override
+	public boolean isAlive() {return (socket != null);}
+
 }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lu.poucy.jsa.JSA;
+import lu.poucy.jsa.exceptions.IllegalJSAClientState;
 import lu.poucy.jsa.exceptions.IllegalJSAServerState;
 import lu.poucy.jsa.exceptions.InvalidKeyException;
 import lu.poucy.jsa.exceptions.KeyToShortException;
@@ -44,12 +45,20 @@ public class JSAServer implements JSA<Thread> {
 			throw new KeyToShortException(key);
 		
 		this.port = port;
+		this.key = key;
+		
+		instance = this;
+	}
+	
+	@Override
+	public JSA<Thread> open() throws Exception {
 		try {
 			this.socket = new ServerSocket(this.port);
 		}catch(BindException e) {
 			throw new IllegalJSAServerState("A server is already started on port: "+this.port);
+		}catch(IOException e) {
+			throw e;
 		}
-		this.key = key;
 		
 		th = new Thread(
 			new Runnable() {
@@ -68,7 +77,7 @@ public class JSAServer implements JSA<Thread> {
 		);
 		th.setName(this.getClass().getCanonicalName()+"-"+port);
 		th.start();
-		instance = this;
+		return instance;
 	}
 	
 	public PacketSender write(PreparedPacket ppacket) {
@@ -107,10 +116,19 @@ public class JSAServer implements JSA<Thread> {
 	public Thread getThread() {return th;}
 	
 	@Override
+	public void close() throws Exception {
+		if(socket != null) {
+			socket.close();
+			return;
+		}
+		throw new IllegalJSAClientState("Client isn't started, unable to close");
+	}
+	
+	@Override
 	public PacketCrypter getPacketCrypter() {return pc;}
 	@Override
 	public void setPacketCrypter(PacketCrypter pc) {this.pc = pc;}
 	@Override
-	public void close() throws IOException {socket.close();}
+	public boolean isAlive() {return (socket != null);}
 	
 }

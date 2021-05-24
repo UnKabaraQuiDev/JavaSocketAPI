@@ -16,11 +16,13 @@ import lu.poucy.jsa.packets.sender.PacketSender;
  */
 public interface JSA<T> {
 	
+	JSA<T> open() throws Exception;
 	PacketSender write(PreparedPacket ppacket);
 	T read() throws IOException, InvalidKeyException;
-	void close() throws IOException;
+	void close() throws Exception;
 	PacketCrypter getPacketCrypter();
 	void setPacketCrypter(PacketCrypter pc);
+	boolean isAlive();
 	
 	public static void error(Exception e, JSAType type, JSALogType log, ServerSocket sock) {
 		//String s = "";
