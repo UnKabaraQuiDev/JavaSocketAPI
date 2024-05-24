@@ -2,6 +2,8 @@
 
 JSA is a packet-based communication system in Java
 
+# Don't use this, use [packets4j](https://github.com/UnKabaraQuiDev/packets4j) instead
+
 ## Summary
 
 1. [Introduction](#introduction)
